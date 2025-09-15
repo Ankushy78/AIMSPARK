@@ -126,7 +126,8 @@
     <table>
       <thead>
         <tr>
-          <th>Team ID</th>
+          <th>Serial Number</th>
+          <th>Problem Statement</th>
           <th>Team Name</th>
           <th>Members</th>
         </tr>
@@ -144,47 +145,49 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function loadAllTeams() {
-      const { data: teams, error } = await supabaseClient
-        .from("teams")
-        .select("*");
+  const { data: teams, error } = await supabaseClient
+    .from("teams")
+    .select("*");
 
-      const teamTable = document.getElementById("teamTable");
+  const teamTable = document.getElementById("teamTable");
 
-      if (error) {
-        teamTable.innerHTML = `<tr><td colspan="3">Error: ${error.message}</td></tr>`;
-        return;
-      }
+  if (error) {
+    teamTable.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`;
+    return;
+  }
 
-      if (!teams || teams.length === 0) {
-        teamTable.innerHTML = "<tr><td colspan='3'>No teams registered yet.</td></tr>";
-        return;
-      }
+  if (!teams || teams.length === 0) {
+    teamTable.innerHTML = "<tr><td colspan='4'>No teams registered yet.</td></tr>";
+    return;
+  }
 
-      let rows = "";
-      teams.forEach(team => {
-        let membersHtml = "";
-        team.members.forEach(m => {
-          membersHtml += `
-            <div class="member-card">
-              <strong>${m.name}</strong><br>
-              <span>${m.email}</span><br>
-              <span>${m.contact}</span><br>
-              <span>${m.dept}, Year ${m.year}</span>
-            </div>
-          `;
-        });
+  let rows = "";
+  teams.forEach((team, index) => {
+    let membersHtml = "";
+    team.members.forEach(m => {
+      membersHtml += `
+        <div class="member-card">
+          <strong>${m.name}</strong><br>
+          <span>${m.email}</span><br>
+          <span>${m.contact}</span><br>
+          <span>${m.dept}, Year ${m.year}</span>
+        </div>
+      `;
+    });
 
-        rows += `
-          <tr>
-            <td><strong>${team.team_id}</strong></td>
-            <td>${team.team_name}</td>
-            <td>${membersHtml}</td>
-          </tr>
-        `;
-      });
+    rows += `
+      <tr>
+        <td>${index + 1}</td> <!-- Serial Number -->
+        <td><strong>${team.problem_statement}</strong></td>
+        <td>${team.team_name}</td>
+        <td>${membersHtml}</td>
+      </tr>
+    `;
+  });
 
-      teamTable.innerHTML = rows;
-    }
+  teamTable.innerHTML = rows;
+}
+
 
     async function logout() {
       await supabaseClient.auth.signOut();
